@@ -2,14 +2,7 @@ const http = require("http");
 const url = require("url");
 const fs = require("fs");
 const { json } = require("stream/consumers");
-const data = fs.readFileSync(
-  `${__dirname}/dev-data/data.json`,
-  "utf-8",
-  (err, data) => {
-    console.log(err);
-    console.log(data);
-  }
-); // this will always fetch initial the server starts and doesn't block the code even it is sync
+const data = fs.readFileSync(`${__dirname}/dev-data/data.json`, "utf-8"); // this will always fetch initial the server starts and doesn't block the code even it is sync
 const productData = JSON.parse(data);
 const cards = fs.readFileSync(`${__dirname}/templates/cards.html`, "utf-8");
 const home = fs.readFileSync(`${__dirname}/templates/overview.html`, "utf-8");
@@ -23,7 +16,6 @@ const app = http.createServer((req, res) => {
       "content-type": "text/html",
     });
     const cardReplace = productData.map(e => replacePlaces(cards, e));
-    console.log(cardReplace);
     const finalHTML = home.replace(/{%CARDS%}/g, cardReplace.join(""));
     res.end(finalHTML);
   } else if (pathname === "/products") {
