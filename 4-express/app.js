@@ -1,21 +1,25 @@
 const express = require('express');
 const morgan = require('morgan');
 const path = require('path');
+const tourRouter = require('./routes/tourRoutes');
+const userRouter = require('./routes/userRoutes');
 
 const app = express();
 
 // middlewares
 app.use(express.json()); //body parse (core)
-app.use(morgan('dev')); //Logger for dev (3rd party)
+app.use(morgan('dev')); //Logger for dev (3rd party) // to show api related logs
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString(); //logging time of request
   console.log('this is my custom middleware');
   next();
 });
 
-const fs = require('fs');
+//Routes
+app.get('/', (req, res) => {
+  res.status(200).end('Welcome to Tours');
+});
+app.use('/api/v1/tours', tourRouter);
+app.use('/api/v1/users', tourRouter);
 
-// const tours = fs.readFileSync(`${__dirname}/dev-data/data/tours`);
-
-console.log(path.resolve(__dirname, `/dev-data/data/tours-simple.json`));
 module.exports = app;
