@@ -1,26 +1,26 @@
-const dotenv = require('dotenv');
-const mongoose = require('mongoose');
+// const dotenv = require('dotenv');
+// const mongoose = require('mongoose');
 
-dotenv.config({ path: './config.env' });
-const DB = process.env.DB.replace('<PASSWORD>', process.env.DB_PASSWORD); // data base connection string from .env
-mongoose
-  .connect(DB, {
-    useNewUrlParser: true,
-    useCreateIndex: true,
-    useFindAndModify: false,
-    useUnifiedTopology: true,
-  })
-  .then(() => {
-    console.log('Db connected');
-  })
-  .catch((err) => {
-    console.log(err);
-  });
+// dotenv.config({ path: './config.env' });
+// const DB = process.env.DB.replace('<PASSWORD>', process.env.DB_PASSWORD); // data base connection string from .env
+// mongoose
+//   .connect(DB, {
+//     useNewUrlParser: true,
+//     useCreateIndex: true,
+//     useFindAndModify: false,
+//     useUnifiedTopology: true,
+//   })
+//   .then(() => {
+//     console.log('Db connected');
+//   })
+//   .catch((err) => {
+//     console.log(err);
+//   });
 
 const fs = require('fs');
 const app = require('./app');
 
 const port = 5000;
 app.listen(port, () => {
-  console.log('server is up and running');
+  console.log('server is up and running 111');
 });
