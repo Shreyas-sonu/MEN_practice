@@ -1,6 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const path = require('path');
+const tourRouter = require('./routes/tourRoutes');
 
 const app = express();
 
@@ -13,9 +14,5 @@ app.use((req, res, next) => {
   next();
 });
 
-const fs = require('fs');
-
-// const tours = fs.readFileSync(`${__dirname}/dev-data/data/tours`);
-
-console.log(path.resolve(__dirname, `/dev-data/data/tours-simple.json`));
+app.route('/api/v1/tours', tourRouter);
 module.exports = app;
