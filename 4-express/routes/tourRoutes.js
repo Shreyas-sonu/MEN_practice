@@ -9,7 +9,6 @@ const {
 
 const tourRouter = express.Router();
 tourRouter.route('/').get(getAllTours).post(createTour);
-
 tourRouter.route('/:id').get(getTour).patch(patchTour).delete(deleteTour);
 
 module.exports = tourRouter;
