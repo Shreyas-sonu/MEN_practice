@@ -17,7 +17,6 @@
 //     console.log(err);
 //   });
 
-const fs = require('fs');
 const app = require('./app');
 
 const port = 5000;
