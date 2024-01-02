@@ -16,7 +16,7 @@ exports.checkId = (req, res, next, val) => {
 };
 exports.checkBody = (req, res, next) => {
   if (!req.body.name || !req.body.price) {
-    res
+    return res
       .status(400)
       .json({ status: 'failed', message: 'Missing name or price please add' });
   }
@@ -77,7 +77,7 @@ exports.patchTour = (req, res) => {
     `${__dirname}/../dev-data/data/tours.json`,
     JSON.stringify(latestData),
     (err) => {
-      console.log(err,'error while patching');
+      console.log(err, 'error while patching');
     }
   );
   res.status(200).json({
