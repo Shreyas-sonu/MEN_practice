@@ -3,6 +3,7 @@ const {
   createTour,
   getAllTours,
   getTour,
+  checkId,
   deleteTour,
   patchTour,
 } = require('./../controllers/tourHandlers');
