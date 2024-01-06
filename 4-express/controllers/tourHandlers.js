@@ -7,10 +7,15 @@ const tours = JSON.parse(
 );
 
 //get all tours
-exports.getAllTours = (req, res) => {
-  res
-    .status(200)
-    .json({ status: 'success', data: tours, length: tours.length });
+exports.getAllTours = async (req, res) => {
+  try {
+    const data = await Tour.find();
+    res
+      .status(200)
+      .json({ status: 'success', data: data, length: data.length });
+  } catch (error) {
+    res.status(404).json({ status: 'no data', error: error });
+  }
 };
 //create a tour
 exports.createTour = async (req, res) => {
