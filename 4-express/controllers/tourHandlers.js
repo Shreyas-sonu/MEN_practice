@@ -1,27 +1,11 @@
 const fs = require('fs');
 const path = require('path');
+const Tour = require('../model/tourModel');
 
 const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/../dev-data/data/tours.json`)
 );
 
-exports.checkId = (req, res, next, val) => {
-  const id = Number.parseInt(val);
-  const toursForDuration = tours.filter((ex) => ex.id === id);
-  if (toursForDuration.length === 0) {
-    return res.status(404).json({ status: 'Failed', message: 'Invalid ID' });
-  } else {
-    next();
-  }
-};
-exports.checkBody = (req, res, next) => {
-  if (!req.body.name || !req.body.price) {
-    return res
-      .status(400)
-      .json({ status: 'failed', message: 'Missing name or price please add' });
-  }
-  next();
-};
 //get all tours
 exports.getAllTours = (req, res) => {
   res
@@ -29,21 +13,14 @@ exports.getAllTours = (req, res) => {
     .json({ status: 'success', data: tours, length: tours.length });
 };
 //create a tour
-exports.createTour = (req, res) => {
-  console.log(req.body);
-  const newId = tours.length;
-  const newTour = { id: newId, ...req.body };
-  tours.push(newTour);
-  fs.writeFile(
-    `${__dirname}/../dev-data/data/tours.json`,
-    JSON.stringify(tours),
-    (err) => {
-      console.log(err);
-    }
-  );
-  res
-    .status(201)
-    .json({ message: 'Data received Successfully', data: newTour });
+exports.createTour = async (req, res) => {
+  const body = req.body;
+  try {
+    const data = await Tour.create(body);
+    res.status(201).json({ message: 'Data received Successfully', data: data });
+  } catch (error) {
+    res.status(400).json({ status: 'Failed', message: error });
+  }
 };
 //get a single tour
 exports.getTour = (req, res) => {
