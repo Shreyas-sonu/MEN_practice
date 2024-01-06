@@ -28,20 +28,32 @@ exports.createTour = async (req, res) => {
   }
 };
 //get a single tour
-exports.getTour = (req, res) => {
+exports.getTour = async (req, res) => {
   const id = req.params.id;
-  const toursForDuration = tours.filter((ex) => ex.id === id);
-  res.status(200).json({
-    status: 'success',
-    data: toursForDuration,
-    length: toursForDuration.length,
-  });
+  try {
+    const Odata = await Tour.findOne({ _id: id }); // old method (UNIVERSAL)
+    const data = await Tour.findById(id); // new method (SPEC for ID)
+    res.status(200).json({
+      status: 'success',
+      data: data,
+      old: Odata,
+      length: data.length,
+    });
+  } catch (error) {
+    res.status(404).json({ status: 'no data', error: error });
+  }
 };
-exports.editTour = (req, res) => {
-  res.status(200).json({
-    status: 'success',
-    data: toursForDuration,
-  });
+exports.editTour = async (req, res) => {
+  const id = req.params.id;
+  try {
+    const data = await Tour.replaceOne({ _id: id }, req.body);
+    res.status(200).json({
+      status: 'Updated',
+      data: data,
+    });
+  } catch (error) {
+    res.status(400).json({ status: 'Failed', message: error });
+  }
 };
 exports.deleteTour = (req, res) => {
   console.log(toursForDuration);
