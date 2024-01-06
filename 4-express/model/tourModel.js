@@ -5,7 +5,9 @@ const tourSchema = new mongoose.Schema({
   name: {
     type: String,
     required: [true, 'A tour must have a name'],
-    unique: true, // validation (in array) doesn't work here
+    unique: [
+      true,`Name Should be Unique`,
+    ],
   },
   rating: {
     type: Number,
@@ -13,7 +15,7 @@ const tourSchema = new mongoose.Schema({
   },
   price: {
     type: Number,
-    required: [true, 'A tour must have a name'],
+    required: [true, 'A tour must have a price bitch'],
   },
 });
 const Tour = mongoose.model('Tour', tourSchema);
