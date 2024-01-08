@@ -14,18 +14,26 @@ exports.getAllTours = async (req, res) => {
     excludedArray.forEach((e) => delete queryObj[e]);
     let queryStr = JSON.stringify(queryObj);
     queryStr = queryStr.replace(/\b(gt|gte|lt|lte)\b/g, (match) => `$${match}`);
-    console.log(JSON.parse(queryStr));
     // const data = await Tour.find({ duration: 5, difficulty: 'easy' }); //! express method
     // const data = await Tour.find().where('duration').equals(5).where('difficulty').equals('easy') //! mongooses method
     let query = Tour.find(JSON.parse(queryStr));
     if (req.query.sort) {
-      query.sort(req.query.sort.split(',').join(' '));
+      query = query.sort(req.query.sort.split(',').join(' '));
+    } else {
+      query = query.sort('-createdAt');
+    }
+    if (req.query.fields) {
+      const fields = req.query.fields.split(',').join(' '); // Remove the join part
+      query = query.select({ name: 1, duration: 1 });
+    } else {
+      query = query.select('-__v');
     }
     const data = await query;
     res
       .status(200)
       .json({ status: 'success', length: data.length, data: data });
   } catch (error) {
+    console.log(error);
     res.status(404).json({ status: 'no data', error: error });
   }
 };
