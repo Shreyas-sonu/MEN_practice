@@ -9,10 +9,18 @@ const tours = JSON.parse(
 //get all tours
 exports.getAllTours = async (req, res) => {
   try {
-    const data = await Tour.find();
+    const excludedArray = ['page', 'sort', 'limit', 'id', 'next'];
+    const queryObj = { ...req.query };
+    excludedArray.forEach((e) => delete queryObj[e]);
+    let queryStr = JSON.stringify(queryObj);
+    queryStr = queryStr.replace(/\b(gt|gte|lt|lte)\b/g, (match) => `$${match}`);
+    console.log(JSON.parse(queryStr));
+    // const data = await Tour.find({ duration: 5, difficulty: 'easy' }); //! express method
+    // const data = await Tour.find().where('duration').equals(5).where('difficulty').equals('easy') //! mongooses method
+    const data = await Tour.find(JSON.parse(queryStr));
     res
       .status(200)
-      .json({ status: 'success', data: data, length: data.length });
+      .json({ status: 'success', length: data.length, data: data });
   } catch (error) {
     res.status(404).json({ status: 'no data', error: error });
   }
