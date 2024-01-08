@@ -17,7 +17,11 @@ exports.getAllTours = async (req, res) => {
     console.log(JSON.parse(queryStr));
     // const data = await Tour.find({ duration: 5, difficulty: 'easy' }); //! express method
     // const data = await Tour.find().where('duration').equals(5).where('difficulty').equals('easy') //! mongooses method
-    const data = await Tour.find(JSON.parse(queryStr));
+    let query = Tour.find(JSON.parse(queryStr));
+    if (req.query.sort) {
+      query.sort(req.query.sort.split(',').join(' '));
+    }
+    const data = await query;
     res
       .status(200)
       .json({ status: 'success', length: data.length, data: data });
