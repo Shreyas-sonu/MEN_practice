@@ -9,11 +9,31 @@ const tours = JSON.parse(
 //get all tours
 exports.getAllTours = async (req, res) => {
   try {
-    const data = await Tour.find();
+    const excludedArray = ['page', 'sort', 'limit', 'id', 'next'];
+    const queryObj = { ...req.query };
+    excludedArray.forEach((e) => delete queryObj[e]);
+    let queryStr = JSON.stringify(queryObj);
+    queryStr = queryStr.replace(/\b(gt|gte|lt|lte)\b/g, (match) => `$${match}`);
+    // const data = await Tour.find({ duration: 5, difficulty: 'easy' }); //! express method
+    // const data = await Tour.find().where('duration').equals(5).where('difficulty').equals('easy') //! mongooses method
+    let query = Tour.find(JSON.parse(queryStr));
+    if (req.query.sort) {
+      query = query.sort(req.query.sort.split(',').join(' '));
+    } else {
+      query = query.sort('-createdAt');
+    }
+    if (req.query.fields) {
+      const fields = req.query.fields.split(',').join(' '); // Remove the join part
+      query = query.select({ name: 1, duration: 1 });
+    } else {
+      query = query.select('-__v');
+    }
+    const data = await query;
     res
       .status(200)
-      .json({ status: 'success', data: data, length: data.length });
+      .json({ status: 'success', length: data.length, data: data });
   } catch (error) {
+    console.log(error);
     res.status(404).json({ status: 'no data', error: error });
   }
 };
