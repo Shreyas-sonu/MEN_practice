@@ -9,7 +9,7 @@ const tours = JSON.parse(
 //get all tours
 exports.getAllTours = async (req, res) => {
   try {
-    const excludedArray = ['page', 'sort', 'limit', 'id', 'next'];
+    const excludedArray = ['page', 'sort', 'limit', 'id', 'next', 'fields'];
     const queryObj = { ...req.query };
     excludedArray.forEach((e) => delete queryObj[e]);
     let queryStr = JSON.stringify(queryObj);
@@ -23,8 +23,9 @@ exports.getAllTours = async (req, res) => {
       query = query.sort('-createdAt');
     }
     if (req.query.fields) {
-      const fields = req.query.fields.split(',').join(' '); // Remove the join part
-      query = query.select({ name: 1, duration: 1 });
+      console.log('what happening here');
+      const mini = req.query.fields.split(',').join(' ');
+      query = query.select(mini);
     } else {
       query = query.select('-__v');
     }
