@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const Tour = require('../model/tourModel');
+const { error } = require('console');
 
 const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/../dev-data/data/tours.json`)
@@ -29,10 +30,18 @@ exports.getAllTours = async (req, res) => {
     } else {
       query = query.select('-__v');
     }
+    const limit = req?.query?.limit ? Number(req.query.limit) : 10;
+    const page = req?.query?.page ? Number(req.query.page) : 1;
+    const totalLength = await query.length;
+    query = query.skip(limit * (page - 1)).limit(limit);
     const data = await query;
-    res
-      .status(200)
-      .json({ status: 'success', length: data.length, data: data });
+    res.status(200).json({
+      status: 'success',
+      length: data.length,
+      total_length: totalLength,
+      page: page,
+      data: data,
+    });
   } catch (error) {
     console.log(error);
     res.status(404).json({ status: 'no data', error: error });
