@@ -1,11 +1,6 @@
 const fs = require('fs');
-const path = require('path');
 const Tour = require('../model/tourModel');
-const { error } = require('console');
 
-const tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/../dev-data/data/tours.json`)
-);
 
 //get all tours
 exports.getAllTours = async (req, res) => {
