@@ -1,6 +1,7 @@
 const express = require('express');
 const {
   createTour,
+  top5Tour,
   getAllTours,
   getTour,
   deleteTour,
@@ -8,6 +9,7 @@ const {
 } = require('./../controllers/tourHandlers');
 
 const tourRouter = express.Router();
+tourRouter.route('/top-5').get(top5Tour, getAllTours);
 tourRouter.route('/').get(getAllTours).post(createTour);
 tourRouter.route('/:id').get(getTour).patch(patchTour).delete(deleteTour);
 
