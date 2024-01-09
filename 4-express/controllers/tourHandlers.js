@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const Tour = require('../model/tourModel');
+const { error } = require('console');
 
 const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/../dev-data/data/tours.json`)
@@ -9,7 +10,7 @@ const tours = JSON.parse(
 //get all tours
 exports.getAllTours = async (req, res) => {
   try {
-    const excludedArray = ['page', 'sort', 'limit', 'id', 'next'];
+    const excludedArray = ['page', 'sort', 'limit', 'id', 'next', 'fields'];
     const queryObj = { ...req.query };
     excludedArray.forEach((e) => delete queryObj[e]);
     let queryStr = JSON.stringify(queryObj);
@@ -23,15 +24,24 @@ exports.getAllTours = async (req, res) => {
       query = query.sort('-createdAt');
     }
     if (req.query.fields) {
-      const fields = req.query.fields.split(',').join(' '); // Remove the join part
-      query = query.select({ name: 1, duration: 1 });
+      console.log('what happening here');
+      const mini = req.query.fields.split(',').join(' ');
+      query = query.select(mini);
     } else {
       query = query.select('-__v');
     }
+    const limit = req?.query?.limit ? Number(req.query.limit) : 10;
+    const page = req?.query?.page ? Number(req.query.page) : 1;
+    const totalLength = await query.length;
+    query = query.skip(limit * (page - 1)).limit(limit);
     const data = await query;
-    res
-      .status(200)
-      .json({ status: 'success', length: data.length, data: data });
+    res.status(200).json({
+      status: 'success',
+      length: data.length,
+      total_length: totalLength,
+      page: page,
+      data: data,
+    });
   } catch (error) {
     console.log(error);
     res.status(404).json({ status: 'no data', error: error });
