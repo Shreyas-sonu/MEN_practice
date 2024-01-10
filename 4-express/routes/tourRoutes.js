@@ -2,6 +2,7 @@ const express = require('express');
 const {
   createTour,
   top5Tour,
+  monthlyPlanTours,
   getAllTours,
   getTourStats,
   getTour,
@@ -10,6 +11,7 @@ const {
 } = require('./../controllers/tourHandlers');
 
 const tourRouter = express.Router();
+tourRouter.route('/monthly-plan/:year').get(monthlyPlanTours);
 tourRouter.route('/top-5').get(top5Tour, getAllTours);
 tourRouter.route('/stats').get(getTourStats);
 tourRouter.route('/').get(getAllTours).post(createTour);
