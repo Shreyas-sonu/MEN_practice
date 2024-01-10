@@ -1,5 +1,6 @@
 const fs = require('fs');
 const Tour = require('../model/tourModel');
+const APIFeatures = require('../utils/apiFeatures');
 
 exports.top5Tour = (req, res, next) => {
   req.query.sort = '-ratingsAverage,price';
@@ -10,41 +11,27 @@ exports.top5Tour = (req, res, next) => {
 //get all tours
 exports.getAllTours = async (req, res) => {
   try {
-    const excludedArray = ['page', 'sort', 'limit', 'id', 'next', 'fields'];
-    const queryObj = { ...req.query };
-    excludedArray.forEach((e) => delete queryObj[e]);
-    let queryStr = JSON.stringify(queryObj);
-    queryStr = queryStr.replace(/\b(gt|gte|lt|lte)\b/g, (match) => `$${match}`);
-    // const data = await Tour.find({ duration: 5, difficulty: 'easy' }); //! express method
-    // const data = await Tour.find().where('duration').equals(5).where('difficulty').equals('easy') //! mongooses method
-    let query = Tour.find(JSON.parse(queryStr));
-    if (req.query.sort) {
-      query = query.sort(req.query.sort.split(',').join(' '));
-    } else {
-      query = query.sort('-createdAt');
-    }
-    if (req.query.fields) {
-      console.log('what happening here');
-      const mini = req.query.fields.split(',').join(' ');
-      query = query.select(mini);
-    } else {
-      query = query.select('-__v');
-    }
-    const limit = req?.query?.limit ? Number(req.query.limit) : 10;
-    const page = req?.query?.page ? Number(req.query.page) : 1;
-    const totalLength = await query.length;
-    query = query.skip(limit * (page - 1)).limit(limit);
-    const data = await query;
+    // EXECUTE QUERY
+    const features = new APIFeatures(Tour.find(), req.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+    const tours = await features.query;
+
+    // SEND RESPONSE
     res.status(200).json({
       status: 'success',
-      length: data.length,
-      total_length: totalLength,
-      page: page,
-      data: data,
+      results: tours.length,
+      data: {
+        tours,
+      },
     });
-  } catch (error) {
-    console.log(error);
-    res.status(404).json({ status: 'no data', error: error });
+  } catch (err) {
+    res.status(404).json({
+      status: 'fail',
+      message: err,
+    });
   }
 };
 //create a tour
@@ -104,5 +91,45 @@ exports.deleteTour = async (req, res) => {
     });
   } catch (error) {
     res.status(404).json({ status: 'Failed', message: error });
+  }
+};
+
+//aggregation
+exports.getTourStats = async (req, res) => {
+  try {
+    const stats = await Tour.aggregate([
+      {
+        $match: { ratingsAverage: { $gte: 4.5 } },
+      },
+      {
+        $group: {
+          _id: { $toUpper: '$difficulty' }, // converting the group criteria
+          numTours: { $sum: 1 }, //adds plus 1 for each of the docs passed through hence count all documents
+          numRatings: { $sum: '$ratingsQuantity' },
+          avgRating: { $avg: '$ratingsAverage' },
+          avgPrice: { $avg: '$price' },
+          minPrice: { $min: '$price' },
+          maxPrice: { $max: '$price' },
+        },
+      },
+      // {
+      //   $match: { _id: { $ne: 'EASY' } }  //? for filtering even after grouping
+      // }
+      {
+        $sort: { avgPrice: 1 }, // 1 means ascending
+      },
+    ]);
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        stats,
+      },
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: 'fail',
+      message: err,
+    });
   }
 };
