@@ -18,6 +18,6 @@ app.get('/', (req, res) => {
   res.status(200).end('Welcome to Tours');
 });
 app.use('/api/v1/tours', tourRouter);
-app.use('/api/v1/users', userRouter);
+// app.use('/api/v1/users', userRouter);
 
 module.exports = app;
