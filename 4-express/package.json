@@ -13,6 +13,7 @@
     "express": "^4.18.2",
     "mongodb": "4.1",
     "mongoose": "^5.13.21",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "slugify": "^1.6.6"
   }
 }
