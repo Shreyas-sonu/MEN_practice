@@ -43,6 +43,10 @@ const tourSchema = new mongoose.Schema(
       trim: true,
       required: [true, 'A tour must have a description'],
     },
+    secretTour: {
+      type: Boolean,
+      default: false,
+    },
     description: {
       type: String,
       trim: true,
@@ -75,11 +79,28 @@ tourSchema.pre('save', function (next) {
   this.slug = slugify(this.name, { lower: true });
   next();
 });
-tourSchema.pre('save', function (next) {
-  console.log('i am saving now');
+// tourSchema.pre('save', function (next) {
+//   console.log('i am saving now');
+//   next();
+// });
+// tourSchema.pre('save', function (doc, next) {
+//   console.log(doc);
+//   next();
+// });
+// tourSchema.pre('find', function (next) {
+//   this.find({ secretTour: { $ne: true } });
+//   next();
+// });
+// tourSchema.pre('findOne', function (next) {
+//   this.find({ secretTour: { $ne: true } });
+//   next();
+// });
+tourSchema.pre(/^find/, function (next) {
+  // will apply to all string starts with find
+  this.find({ secretTour: { $ne: true } });
   next();
 });
-tourSchema.pre('save', function (doc, next) {
+tourSchema.post(/^find/, function (doc, next) {
   console.log(doc);
   next();
 });
