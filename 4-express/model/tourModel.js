@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const slugify = require('slugify');
 
 //creating a schema
 const tourSchema = new mongoose.Schema(
@@ -68,4 +69,17 @@ module.exports = Tour;
 
 tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
+});
+
+tourSchema.pre('save', function (next) {
+  this.slug = slugify(this.name, { lower: true });
+  next();
+});
+tourSchema.pre('save', function (next) {
+  console.log('i am saving now');
+  next();
+});
+tourSchema.pre('save', function (doc, next) {
+  console.log(doc);
+  next();
 });
